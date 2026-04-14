@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+.eggs/
+env/
+Desktop.ini
+dist/
+venv/
+Thumbs.db
+*.log
+.pytest_cache/
+.venv/
+.ruff_cache/
+htmlcov/
