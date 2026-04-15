@@ -99,12 +99,29 @@ def _extract_flow_calls(tree: ast.Module) -> List[PrefectFlow]:
 
 
 def parse_prefect_file(path: str) -> List[PrefectFlow]:
-    """Parse a Python file and return all Prefect flow definitions found."""
-    source = Path(path).read_text(encoding="utf-8")
+    """Parse a Prefect flow file and return all discovered flow definitions.
+
+    Args:
+        path: Path to the Python source file containing Prefect flow definitions.
+
+    Returns:
+        A list of :class:`PrefectFlow` instances found in the file.
+
+    Raises:
+        PrefectParseError: If the file cannot be read or contains invalid syntax.
+    """
+    source_path = Path(path)
+    try:
+        source = source_path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise PrefectParseError(f"Cannot read file '{path}': {exc}") from exc
+
     try:
         tree = ast.parse(source, filename=path)
     except SyntaxError as exc:
-        raise PrefectParseError(f"Syntax error in {path}: {exc}") from exc
+        raise PrefectParseError(
+            f"Syntax error in '{path}' at line {exc.lineno}: {exc.msg}"
+        ) from exc
 
     flows = _extract_flow_calls(tree)
     for flow in flows:
