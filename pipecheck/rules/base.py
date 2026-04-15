@@ -36,6 +36,7 @@ class Rule:
         raise NotImplementedError
 
     def _result(self, pipeline_id: str, message: str, **details: Any) -> LintResult:
+        """Construct a LintResult using this rule's metadata."""
         return LintResult(
             rule_id=self.rule_id,
             severity=self.severity,
@@ -43,3 +44,11 @@ class Rule:
             pipeline_id=pipeline_id,
             details=details,
         )
+
+    def __init_subclass__(cls, **kwargs: Any) -> None:
+        """Validate that subclasses define required class attributes."""
+        super().__init_subclass__(**kwargs)
+        if not getattr(cls, "rule_id", ""):
+            raise TypeError(
+                f"Rule subclass '{cls.__name__}' must define a non-empty 'rule_id' class attribute."
+            )
