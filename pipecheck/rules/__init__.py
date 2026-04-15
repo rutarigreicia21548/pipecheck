@@ -1,15 +1,20 @@
-"""Lint rules package for pipecheck.
+from typing import Any
 
-Exposes a default rule registry used by the CLI linter.
-"""
-
-from __future__ import annotations
-
-from pipecheck.rules.base import LintResult, Rule, Severity
+from pipecheck.rules.base import LintResult, Rule
 from pipecheck.rules.common_rules import (
     InvalidIdCharactersRule,
     NoPipelineIdRule,
     NoTagsRule,
+)
+from pipecheck.rules.dependency_rules import (
+    CircularDependencyRule,
+    NoDependenciesRule,
+    TooManyDependenciesRule,
+)
+from pipecheck.rules.naming_rules import (
+    IdTooLongRule,
+    SnakeCaseIdRule,
+    TagNamingRule,
 )
 from pipecheck.rules.schedule_rules import (
     FrequentScheduleRule,
@@ -17,37 +22,31 @@ from pipecheck.rules.schedule_rules import (
     NoScheduleRule,
 )
 
-__all__ = [
-    # base
-    "LintResult",
-    "Rule",
-    "Severity",
-    # common
-    "NoPipelineIdRule",
-    "InvalidIdCharactersRule",
-    "NoTagsRule",
-    # schedule
-    "NoScheduleRule",
-    "InvalidCronScheduleRule",
-    "FrequentScheduleRule",
-]
-
-#: Default ordered list of rules applied during a lint run.
 DEFAULT_RULES: list[Rule] = [
+    # Common
     NoPipelineIdRule(),
     InvalidIdCharactersRule(),
     NoTagsRule(),
+    # Naming
+    SnakeCaseIdRule(),
+    IdTooLongRule(),
+    TagNamingRule(),
+    # Schedule
     NoScheduleRule(),
     InvalidCronScheduleRule(),
     FrequentScheduleRule(),
+    # Dependencies
+    NoDependenciesRule(),
+    CircularDependencyRule(),
+    TooManyDependenciesRule(),
 ]
 
 
-def run_rules(pipeline: object, rules: list[Rule] | None = None) -> list[LintResult]:
-    """Run *rules* (default: :data:`DEFAULT_RULES`) against *pipeline*.
-
-    Returns a list of :class:`LintResult` objects for every failed check.
-    """
+def run_rules(
+    pipeline: Any,
+    rules: list[Rule] | None = None,
+) -> list[LintResult]:
+    """Run all rules (or a custom list) against *pipeline* and return violations."""
     active_rules = rules if rules is not None else DEFAULT_RULES
     results: list[LintResult] = []
     for rule in active_rules:
