@@ -63,6 +63,16 @@ def test_invalid_ids_warn(pid):
     assert results[0].rule_id == "PC002"
 
 
+def test_invalid_id_characters_skipped_when_no_id():
+    """InvalidIdCharactersRule should produce no results when no id is present.
+
+    The rule is only meaningful once an id exists; PC001 already covers the
+    missing-id case, so PC002 should not fire redundantly.
+    """
+    rule = InvalidIdCharactersRule()
+    assert rule.check(_FakePipeline()) == []
+
+
 # --- NoTagsRule ---
 
 def test_no_tags_returns_info():
