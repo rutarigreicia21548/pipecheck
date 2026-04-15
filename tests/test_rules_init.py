@@ -59,3 +59,15 @@ def test_run_rules_collects_failures():
     )
     failed = [r for r in results if not r.passed]
     assert len(failed) == 2
+
+
+def test_run_rules_result_contains_rule_name():
+    """Each result should carry the name of the rule that produced it."""
+    pipeline = _FullPipeline(retries=None)
+    results = run_rules(
+        pipeline,
+        rules=[NoRetriesRule(), TooManyRetriesRule()],
+    )
+    result_names = [r.rule_name for r in results]
+    assert "no-retries" in result_names
+    assert "too-many-retries" in result_names
