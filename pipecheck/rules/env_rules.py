@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from pipecheck.rules.base import Rule, LintResult, Severity
 
 ALLOWED_ENVS = {"dev", "staging", "prod", "production", "development", "test"}
+PRODUCTION_ENVS = {"prod", "production"}
 
 
 @dataclass
@@ -49,11 +50,30 @@ class ProductionWithoutOwnerRule(Rule):
     def check(self, pipeline) -> LintResult:
         env = getattr(pipeline, "environment", None)
         owner = getattr(pipeline, "owner", None)
-        if env and env.lower() in {"prod", "production"} and not owner:
+        if env and env.lower() in PRODUCTION_ENVS and not owner:
             return LintResult(
                 rule=self.name,
                 severity=self.severity,
                 message="Production pipeline must specify an owner",
+                passed=False,
+            )
+        return LintResult(rule=self.name, severity=self.severity, message="OK", passed=True)
+
+
+@dataclass
+class ProductionWithoutNotificationsRule(Rule):
+    name: str = "prod-requires-notifications"
+    description: str = "Production pipelines must have notifications configured"
+    severity: Severity = Severity.WARNING
+
+    def check(self, pipeline) -> LintResult:
+        env = getattr(pipeline, "environment", None)
+        notifications = getattr(pipeline, "notifications", None)
+        if env and env.lower() in PRODUCTION_ENVS and not notifications:
+            return LintResult(
+                rule=self.name,
+                severity=self.severity,
+                message="Production pipeline should configure notifications",
                 passed=False,
             )
         return LintResult(rule=self.name, severity=self.severity, message="OK", passed=True)
