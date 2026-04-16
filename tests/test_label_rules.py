@@ -73,6 +73,13 @@ def test_valid_labels_pass_format_rule():
     assert result.severity == Severity.OK
 
 
+def test_none_labels_passes_format_rule():
+    """Labels being None should not cause InvalidLabelFormatRule to error out."""
+    p = _FakePipeline(labels=None)
+    result = InvalidLabelFormatRule().check(p)
+    assert result.severity == Severity.OK
+
+
 def test_reserved_label_returns_warning():
     p = _FakePipeline(labels=["deprecated"])
     result = ReservedLabelRule().check(p)
@@ -88,5 +95,12 @@ def test_multiple_reserved_labels_returns_warning():
 
 def test_no_reserved_labels_passes():
     p = _FakePipeline(labels=["team-data", "finance"])
+    result = ReservedLabelRule().check(p)
+    assert result.severity == Severity.OK
+
+
+def test_none_labels_passes_reserved_rule():
+    """Labels being None should not cause ReservedLabelRule to error out."""
+    p = _FakePipeline(labels=None)
     result = ReservedLabelRule().check(p)
     assert result.severity == Severity.OK
