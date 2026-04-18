@@ -32,3 +32,12 @@ def test_invalid_trigger_type_produces_error():
     results = [r.check(p) for r in _trigger_rules()]
     severities = [r.severity for r in results]
     assert Severity.ERROR in severities
+
+
+def test_too_many_trigger_conditions_produces_error():
+    """A trigger with an excessive number of conditions should produce an ERROR."""
+    many_conditions = [f"condition_{i}" for i in range(20)]
+    p = _FullPipeline(trigger={"type": "scheduled", "conditions": many_conditions})
+    results = [r.check(p) for r in _trigger_rules()]
+    severities = [r.severity for r in results]
+    assert Severity.ERROR in severities
