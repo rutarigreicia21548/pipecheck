@@ -1,5 +1,3 @@
-from typing import Any, List, Optional
-from pipecheck.rules.base import LintResult, Rule
 from pipecheck.rules.common_rules import NoPipelineIdRule, InvalidIdCharactersRule, NoTagsRule
 from pipecheck.rules.schedule_rules import NoScheduleRule, InvalidCronScheduleRule, FrequentScheduleRule
 from pipecheck.rules.naming_rules import SnakeCaseIdRule, IdTooLongRule, TagNamingRule
@@ -20,10 +18,13 @@ from pipecheck.rules.metadata_rules import NoMetadataRule, InvalidMetadataTypeRu
 from pipecheck.rules.access_rules import NoAccessLevelRule, InvalidAccessLevelRule, NoAllowedRolesRule
 from pipecheck.rules.data_quality_rules import NoDataQualityChecksRule, InvalidCheckTypeRule, TooManyChecksRule
 from pipecheck.rules.checkpoint_rules import NoCheckpointRule, InvalidCheckpointIntervalRule, CheckpointIntervalTooLargeRule
-from pipecheck.rules.lineage_rules import NoLineageRule, MissingLineageInputsRule, MissingLineageOutputsRule, InvalidLineageDatasetRule
+from pipecheck.rules.lineage_rules import NoLineageRule, MissingLineageInputsRule, MissingLineageOutputsRule
+from pipecheck.rules.trigger_rules import NoTriggerRule, InvalidTriggerTypeRule, TooManyTriggerConditionsRule
+from pipecheck.rules.cost_rules import NoCostEstimateRule, CostEstimateTooHighRule, InvalidCostTierRule
+from pipecheck.rules.compliance_rules import NoComplianceTagRule, InvalidComplianceTagRule, PiiWithoutOwnerRule
+from pipecheck.rules.cache_rules import NoCacheStrategyRule, InvalidCacheStrategyRule, CacheTTLTooLongRule, ZeroCacheTTLRule
 
-
-DEFAULT_RULES: List[Rule] = [
+DEFAULT_RULES = [
     NoPipelineIdRule(), InvalidIdCharactersRule(), NoTagsRule(),
     NoScheduleRule(), InvalidCronScheduleRule(), FrequentScheduleRule(),
     SnakeCaseIdRule(), IdTooLongRule(), TagNamingRule(),
@@ -44,10 +45,15 @@ DEFAULT_RULES: List[Rule] = [
     NoAccessLevelRule(), InvalidAccessLevelRule(), NoAllowedRolesRule(),
     NoDataQualityChecksRule(), InvalidCheckTypeRule(), TooManyChecksRule(),
     NoCheckpointRule(), InvalidCheckpointIntervalRule(), CheckpointIntervalTooLargeRule(),
-    NoLineageRule(), MissingLineageInputsRule(), MissingLineageOutputsRule(), InvalidLineageDatasetRule(),
+    NoLineageRule(), MissingLineageInputsRule(), MissingLineageOutputsRule(),
+    NoTriggerRule(), InvalidTriggerTypeRule(), TooManyTriggerConditionsRule(),
+    NoCostEstimateRule(), CostEstimateTooHighRule(), InvalidCostTierRule(),
+    NoComplianceTagRule(), InvalidComplianceTagRule(), PiiWithoutOwnerRule(),
+    NoCacheStrategyRule(), InvalidCacheStrategyRule(), CacheTTLTooLongRule(), ZeroCacheTTLRule(),
 ]
 
 
-def run_rules(pipeline: Any, rules: Optional[List[Rule]] = None) -> List[LintResult]:
-    active_rules = rules if rules is not None else DEFAULT_RULES
-    return [rule.check(pipeline) for rule in active_rules]
+def run_rules(pipeline, rules=None):
+    if rules is None:
+        rules = DEFAULT_RULES
+    return [rule.check(pipeline) for rule in rules]
