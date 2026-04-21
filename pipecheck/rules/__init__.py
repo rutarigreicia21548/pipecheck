@@ -22,7 +22,14 @@ from pipecheck.rules.lineage_rules import NoLineageRule, MissingLineageInputsRul
 from pipecheck.rules.trigger_rules import NoTriggerRule, InvalidTriggerTypeRule, TooManyTriggerConditionsRule
 from pipecheck.rules.cost_rules import NoCostEstimateRule, CostEstimateTooHighRule, InvalidCostTierRule
 from pipecheck.rules.compliance_rules import NoComplianceTagRule, InvalidComplianceTagRule, PiiWithoutOwnerRule
-from pipecheck.rules.cache_rules import NoCacheStrategyRule, InvalidCacheStrategyRule, CacheTTLTooLongRule, ZeroCacheTTLRule
+from pipecheck.rules.cache_rules import NoCacheStrategyRule, InvalidCacheStrategyRule, CacheTTLTooLongRule
+from pipecheck.rules.parallelism_rules import NoParallelismRule, ParallelismTooHighRule, ZeroParallelismRule
+from pipecheck.rules.backfill_rules import NoBackfillConfigRule, InvalidBackfillStrategyRule, BackfillWindowTooLargeRule
+from pipecheck.rules.idempotency_rules import NoIdempotencyRule, InvalidIdempotencyStrategyRule, IdempotencyWithoutKeyRule
+from pipecheck.rules.logging_rules import NoLoggingConfigRule, InvalidLogLevelRule, LogRetentionTooLongRule
+from pipecheck.rules.runtime_rules import NoRuntimeLimitRule, RuntimeTooLongRule, RuntimeWarnThresholdRule
+from pipecheck.rules.priority_rules import NoPriorityRule, InvalidPriorityLevelRule, PriorityWeightTooHighRule
+from pipecheck.rules.encryption_rules import NoEncryptionRule, WeakEncryptionRule, UnrecognizedEncryptionRule
 
 DEFAULT_RULES = [
     NoPipelineIdRule(), InvalidIdCharactersRule(), NoTagsRule(),
@@ -49,7 +56,14 @@ DEFAULT_RULES = [
     NoTriggerRule(), InvalidTriggerTypeRule(), TooManyTriggerConditionsRule(),
     NoCostEstimateRule(), CostEstimateTooHighRule(), InvalidCostTierRule(),
     NoComplianceTagRule(), InvalidComplianceTagRule(), PiiWithoutOwnerRule(),
-    NoCacheStrategyRule(), InvalidCacheStrategyRule(), CacheTTLTooLongRule(), ZeroCacheTTLRule(),
+    NoCacheStrategyRule(), InvalidCacheStrategyRule(), CacheTTLTooLongRule(),
+    NoParallelismRule(), ParallelismTooHighRule(), ZeroParallelismRule(),
+    NoBackfillConfigRule(), InvalidBackfillStrategyRule(), BackfillWindowTooLargeRule(),
+    NoIdempotencyRule(), InvalidIdempotencyStrategyRule(), IdempotencyWithoutKeyRule(),
+    NoLoggingConfigRule(), InvalidLogLevelRule(), LogRetentionTooLongRule(),
+    NoRuntimeLimitRule(), RuntimeTooLongRule(), RuntimeWarnThresholdRule(),
+    NoPriorityRule(), InvalidPriorityLevelRule(), PriorityWeightTooHighRule(),
+    NoEncryptionRule(), WeakEncryptionRule(), UnrecognizedEncryptionRule(),
 ]
 
 
