@@ -1,3 +1,4 @@
+from pipecheck.rules.base import LintResult, Severity
 from pipecheck.rules.common_rules import NoPipelineIdRule, InvalidIdCharactersRule, NoTagsRule
 from pipecheck.rules.schedule_rules import NoScheduleRule, InvalidCronScheduleRule, FrequentScheduleRule
 from pipecheck.rules.naming_rules import SnakeCaseIdRule, IdTooLongRule, TagNamingRule
@@ -30,6 +31,14 @@ from pipecheck.rules.logging_rules import NoLoggingConfigRule, InvalidLogLevelRu
 from pipecheck.rules.runtime_rules import NoRuntimeLimitRule, RuntimeTooLongRule, RuntimeWarnThresholdRule
 from pipecheck.rules.priority_rules import NoPriorityRule, InvalidPriorityLevelRule, PriorityWeightTooHighRule
 from pipecheck.rules.encryption_rules import NoEncryptionRule, WeakEncryptionRule, UnrecognizedEncryptionRule
+from pipecheck.rules.audit_rules import NoAuditConfigRule, InvalidAuditLevelRule, AuditRetentionTooLongRule
+from pipecheck.rules.deprecation_rules import (
+    NoDeprecationPolicyRule,
+    InvalidDeprecationDateRule,
+    DeprecatedPipelineActiveRule,
+    NoDeprecationOwnerRule,
+)
+
 
 DEFAULT_RULES = [
     NoPipelineIdRule(), InvalidIdCharactersRule(), NoTagsRule(),
@@ -64,10 +73,13 @@ DEFAULT_RULES = [
     NoRuntimeLimitRule(), RuntimeTooLongRule(), RuntimeWarnThresholdRule(),
     NoPriorityRule(), InvalidPriorityLevelRule(), PriorityWeightTooHighRule(),
     NoEncryptionRule(), WeakEncryptionRule(), UnrecognizedEncryptionRule(),
+    NoAuditConfigRule(), InvalidAuditLevelRule(), AuditRetentionTooLongRule(),
+    NoDeprecationPolicyRule(), InvalidDeprecationDateRule(),
+    DeprecatedPipelineActiveRule(), NoDeprecationOwnerRule(),
 ]
 
 
-def run_rules(pipeline, rules=None):
+def run_rules(pipeline, rules=None) -> list[LintResult]:
     if rules is None:
         rules = DEFAULT_RULES
     return [rule.check(pipeline) for rule in rules]
