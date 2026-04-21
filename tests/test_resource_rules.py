@@ -74,3 +74,16 @@ def test_no_cpu_no_error_from_too_high_rule():
     p = _FakePipeline(cpu_limit=None)
     result = CPULimitTooHighRule().check(p)
     assert result.severity == Severity.OK
+
+
+@pytest.mark.parametrize("memory_limit,expected_severity", [
+    (None, Severity.WARNING),
+    (0, Severity.WARNING),
+    (1, Severity.OK),
+    (512, Severity.OK),
+])
+def test_no_memory_limit_rule_parametrized(memory_limit, expected_severity):
+    """Verify NoMemoryLimitRule across boundary and typical values."""
+    p = _FakePipeline(memory_limit=memory_limit)
+    result = NoMemoryLimitRule().check(p)
+    assert result.severity == expected_severity
