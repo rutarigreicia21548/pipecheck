@@ -1,3 +1,8 @@
+from __future__ import annotations
+
+from typing import Any
+
+from pipecheck.rules.base import LintResult
 from pipecheck.rules.common_rules import NoPipelineIdRule, InvalidIdCharactersRule, NoTagsRule
 from pipecheck.rules.schedule_rules import NoScheduleRule, InvalidCronScheduleRule, FrequentScheduleRule
 from pipecheck.rules.naming_rules import SnakeCaseIdRule, IdTooLongRule, TagNamingRule
@@ -34,12 +39,11 @@ from pipecheck.rules.audit_rules import NoAuditConfigRule, InvalidAuditLevelRule
 from pipecheck.rules.deprecation_rules import NoDeprecationPolicyRule, InvalidDeprecationDateRule, DeprecatedPipelineActiveRule
 from pipecheck.rules.secrets_rules import NoSecretsConfigRule, InvalidSecretBackendRule, InsecureSecretBackendRule
 from pipecheck.rules.rollback_rules import NoRollbackConfigRule, InvalidRollbackStrategyRule, RollbackWindowTooLargeRule
-from pipecheck.rules.observability_rules import (
-    NoObservabilityConfigRule,
-    InvalidTracingBackendRule,
-    InvalidMetricsBackendRule,
-    TooManyCustomMetricsRule,
-)
+from pipecheck.rules.observability_rules import NoObservabilityConfigRule, InvalidTracingBackendRule, InvalidMetricsBackendRule
+from pipecheck.rules.documentation_rules import NoRunbookRule, InvalidRunbookFormatRule, NoChangelogRule
+from pipecheck.rules.freshness_rules import NoFreshnessConfigRule, InvalidFreshnessUnitRule, FreshnessTooLenientRule
+from pipecheck.rules.rate_limit_rules import NoRateLimitRule, InvalidRateLimitUnitRule, RateLimitTooHighRule
+from pipecheck.rules.security_rules import NoSecurityConfigRule, InvalidScanLevelRule, WeakAuthMethodRule
 
 _DEFAULT_RULES = [
     NoPipelineIdRule(), InvalidIdCharactersRule(), NoTagsRule(),
@@ -78,12 +82,15 @@ _DEFAULT_RULES = [
     NoDeprecationPolicyRule(), InvalidDeprecationDateRule(), DeprecatedPipelineActiveRule(),
     NoSecretsConfigRule(), InvalidSecretBackendRule(), InsecureSecretBackendRule(),
     NoRollbackConfigRule(), InvalidRollbackStrategyRule(), RollbackWindowTooLargeRule(),
-    NoObservabilityConfigRule(), InvalidTracingBackendRule(),
-    InvalidMetricsBackendRule(), TooManyCustomMetricsRule(),
+    NoObservabilityConfigRule(), InvalidTracingBackendRule(), InvalidMetricsBackendRule(),
+    NoRunbookRule(), InvalidRunbookFormatRule(), NoChangelogRule(),
+    NoFreshnessConfigRule(), InvalidFreshnessUnitRule(), FreshnessTooLenientRule(),
+    NoRateLimitRule(), InvalidRateLimitUnitRule(), RateLimitTooHighRule(),
+    NoSecurityConfigRule(), InvalidScanLevelRule(), WeakAuthMethodRule(),
 ]
 
 
-def run_rules(pipeline, rules=None):
-    """Run all rules (or a provided subset) against a pipeline object."""
+def run_rules(pipeline: Any, rules: list | None = None) -> list[LintResult]:
+    """Run all rules (or a custom list) against *pipeline* and return results."""
     active_rules = rules if rules is not None else _DEFAULT_RULES
     return [rule.check(pipeline) for rule in active_rules]
