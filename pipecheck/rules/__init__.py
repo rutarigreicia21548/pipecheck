@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, List
 
-from pipecheck.rules.base import LintResult
+from pipecheck.rules.base import LintResult, Rule
 from pipecheck.rules.common_rules import NoPipelineIdRule, InvalidIdCharactersRule, NoTagsRule
 from pipecheck.rules.schedule_rules import NoScheduleRule, InvalidCronScheduleRule, FrequentScheduleRule
 from pipecheck.rules.naming_rules import SnakeCaseIdRule, IdTooLongRule, TagNamingRule
@@ -44,8 +44,12 @@ from pipecheck.rules.documentation_rules import NoRunbookRule, InvalidRunbookFor
 from pipecheck.rules.freshness_rules import NoFreshnessConfigRule, InvalidFreshnessUnitRule, FreshnessTooLenientRule
 from pipecheck.rules.rate_limit_rules import NoRateLimitRule, InvalidRateLimitUnitRule, RateLimitTooHighRule
 from pipecheck.rules.security_rules import NoSecurityConfigRule, InvalidScanLevelRule, WeakAuthMethodRule
+from pipecheck.rules.storage_rules import NoStorageConfigRule, InvalidStorageBackendRule, InvalidStorageClassRule
+from pipecheck.rules.pipeline_health_rules import NoPipelineHealthRule, InvalidHealthStatusRule, TerminalHealthWithoutDeprecationRule
+from pipecheck.rules.network_rules import NoNetworkConfigRule, InvalidNetworkModeRule, TooManyOpenPortsRule
+from pipecheck.rules.windowing_rules import NoWindowingConfigRule, InvalidWindowTypeRule, WindowSizeTooLargeRule, InvalidWindowUnitRule
 
-_DEFAULT_RULES = [
+DEFAULT_RULES: List[Rule] = [
     NoPipelineIdRule(), InvalidIdCharactersRule(), NoTagsRule(),
     NoScheduleRule(), InvalidCronScheduleRule(), FrequentScheduleRule(),
     SnakeCaseIdRule(), IdTooLongRule(), TagNamingRule(),
@@ -87,10 +91,14 @@ _DEFAULT_RULES = [
     NoFreshnessConfigRule(), InvalidFreshnessUnitRule(), FreshnessTooLenientRule(),
     NoRateLimitRule(), InvalidRateLimitUnitRule(), RateLimitTooHighRule(),
     NoSecurityConfigRule(), InvalidScanLevelRule(), WeakAuthMethodRule(),
+    NoStorageConfigRule(), InvalidStorageBackendRule(), InvalidStorageClassRule(),
+    NoPipelineHealthRule(), InvalidHealthStatusRule(), TerminalHealthWithoutDeprecationRule(),
+    NoNetworkConfigRule(), InvalidNetworkModeRule(), TooManyOpenPortsRule(),
+    NoWindowingConfigRule(), InvalidWindowTypeRule(), WindowSizeTooLargeRule(), InvalidWindowUnitRule(),
 ]
 
 
-def run_rules(pipeline: Any, rules: list | None = None) -> list[LintResult]:
-    """Run all rules (or a custom list) against *pipeline* and return results."""
-    active_rules = rules if rules is not None else _DEFAULT_RULES
+def run_rules(pipeline: Any, rules: List[Rule] = None) -> List[LintResult]:
+    """Run all rules against a pipeline object and return a list of LintResults."""
+    active_rules = rules if rules is not None else DEFAULT_RULES
     return [rule.check(pipeline) for rule in active_rules]
