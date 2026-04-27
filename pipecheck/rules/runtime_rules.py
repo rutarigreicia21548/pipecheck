@@ -5,6 +5,18 @@ MAX_RUNTIME_HOURS = 24
 WARN_RUNTIME_HOURS = 8
 
 
+def _parse_runtime(runtime):
+    """Attempt to parse runtime as a float number of hours.
+
+    Returns (float, None) on success or (None, LintResult) if parsing fails,
+    allowing callers to return the error result immediately.
+    """
+    try:
+        return float(runtime), None
+    except (TypeError, ValueError):
+        return None, None  # caller decides how to handle non-numeric
+
+
 @dataclass
 class NoRuntimeLimitRule(Rule):
     name: str = "no_runtime_limit"
