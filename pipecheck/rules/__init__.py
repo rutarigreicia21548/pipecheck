@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, List
 
-from pipecheck.rules.base import LintResult, Rule
+from pipecheck.rules.base import LintResult
 from pipecheck.rules.common_rules import NoPipelineIdRule, InvalidIdCharactersRule, NoTagsRule
 from pipecheck.rules.schedule_rules import NoScheduleRule, InvalidCronScheduleRule, FrequentScheduleRule
 from pipecheck.rules.naming_rules import SnakeCaseIdRule, IdTooLongRule, TagNamingRule
@@ -32,7 +32,7 @@ from pipecheck.rules.parallelism_rules import NoParallelismRule, ParallelismTooH
 from pipecheck.rules.backfill_rules import NoBackfillConfigRule, InvalidBackfillStrategyRule, BackfillWindowTooLargeRule
 from pipecheck.rules.idempotency_rules import NoIdempotencyRule, InvalidIdempotencyStrategyRule, IdempotencyWithoutKeyRule
 from pipecheck.rules.logging_rules import NoLoggingConfigRule, InvalidLogLevelRule, LogRetentionTooLongRule
-from pipecheck.rules.runtime_rules import NoRuntimeLimitRule, RuntimeTooLongRule, RuntimeWarnThresholdRule
+from pipecheck.rules.runtime_rules import NoRuntimeLimitRule, RuntimeTooLongRule
 from pipecheck.rules.priority_rules import NoPriorityRule, InvalidPriorityLevelRule, PriorityWeightTooHighRule
 from pipecheck.rules.encryption_rules import NoEncryptionRule, WeakEncryptionRule, UnrecognizedEncryptionRule
 from pipecheck.rules.audit_rules import NoAuditConfigRule, InvalidAuditLevelRule, AuditRetentionTooLongRule
@@ -47,9 +47,20 @@ from pipecheck.rules.security_rules import NoSecurityConfigRule, InvalidScanLeve
 from pipecheck.rules.storage_rules import NoStorageConfigRule, InvalidStorageBackendRule, InvalidStorageClassRule
 from pipecheck.rules.pipeline_health_rules import NoPipelineHealthRule, InvalidHealthStatusRule, TerminalHealthWithoutDeprecationRule
 from pipecheck.rules.network_rules import NoNetworkConfigRule, InvalidNetworkModeRule, TooManyOpenPortsRule
-from pipecheck.rules.windowing_rules import NoWindowingConfigRule, InvalidWindowTypeRule, WindowSizeTooLargeRule, InvalidWindowUnitRule
+from pipecheck.rules.windowing_rules import NoWindowingConfigRule, InvalidWindowTypeRule, WindowSizeTooLargeRule
+from pipecheck.rules.profiling_rules import NoProfilingConfigRule, InvalidProfilingBackendRule, SampleRateTooHighRule
+from pipecheck.rules.quota_rules import NoQuotaConfigRule, InvalidQuotaUnitRule, QuotaLimitTooHighRule
+from pipecheck.rules.drift_rules import NoDriftConfigRule, InvalidDriftStrategyRule, DriftThresholdTooHighRule
+from pipecheck.rules.fan_out_rules import NoFanOutConfigRule, FanOutTooHighRule, FanInTooHighRule
+from pipecheck.rules.sampling_rules import NoSamplingConfigRule, InvalidSamplingStrategyRule, SamplingRateOutOfRangeRule
+from pipecheck.rules.isolation_rules import (
+    NoIsolationConfigRule,
+    InvalidIsolationLevelRule,
+    InsecureIsolationLevelRule,
+    TooManySharedResourcesRule,
+)
 
-DEFAULT_RULES: List[Rule] = [
+DEFAULT_RULES = [
     NoPipelineIdRule(), InvalidIdCharactersRule(), NoTagsRule(),
     NoScheduleRule(), InvalidCronScheduleRule(), FrequentScheduleRule(),
     SnakeCaseIdRule(), IdTooLongRule(), TagNamingRule(),
@@ -79,7 +90,7 @@ DEFAULT_RULES: List[Rule] = [
     NoBackfillConfigRule(), InvalidBackfillStrategyRule(), BackfillWindowTooLargeRule(),
     NoIdempotencyRule(), InvalidIdempotencyStrategyRule(), IdempotencyWithoutKeyRule(),
     NoLoggingConfigRule(), InvalidLogLevelRule(), LogRetentionTooLongRule(),
-    NoRuntimeLimitRule(), RuntimeTooLongRule(), RuntimeWarnThresholdRule(),
+    NoRuntimeLimitRule(), RuntimeTooLongRule(),
     NoPriorityRule(), InvalidPriorityLevelRule(), PriorityWeightTooHighRule(),
     NoEncryptionRule(), WeakEncryptionRule(), UnrecognizedEncryptionRule(),
     NoAuditConfigRule(), InvalidAuditLevelRule(), AuditRetentionTooLongRule(),
@@ -94,11 +105,18 @@ DEFAULT_RULES: List[Rule] = [
     NoStorageConfigRule(), InvalidStorageBackendRule(), InvalidStorageClassRule(),
     NoPipelineHealthRule(), InvalidHealthStatusRule(), TerminalHealthWithoutDeprecationRule(),
     NoNetworkConfigRule(), InvalidNetworkModeRule(), TooManyOpenPortsRule(),
-    NoWindowingConfigRule(), InvalidWindowTypeRule(), WindowSizeTooLargeRule(), InvalidWindowUnitRule(),
+    NoWindowingConfigRule(), InvalidWindowTypeRule(), WindowSizeTooLargeRule(),
+    NoProfilingConfigRule(), InvalidProfilingBackendRule(), SampleRateTooHighRule(),
+    NoQuotaConfigRule(), InvalidQuotaUnitRule(), QuotaLimitTooHighRule(),
+    NoDriftConfigRule(), InvalidDriftStrategyRule(), DriftThresholdTooHighRule(),
+    NoFanOutConfigRule(), FanOutTooHighRule(), FanInTooHighRule(),
+    NoSamplingConfigRule(), InvalidSamplingStrategyRule(), SamplingRateOutOfRangeRule(),
+    NoIsolationConfigRule(), InvalidIsolationLevelRule(),
+    InsecureIsolationLevelRule(), TooManySharedResourcesRule(),
 ]
 
 
-def run_rules(pipeline: Any, rules: List[Rule] = None) -> List[LintResult]:
-    """Run all rules against a pipeline object and return a list of LintResults."""
+def run_rules(pipeline: Any, rules: List = None) -> List[LintResult]:
+    """Run all (or provided) rules against a pipeline object."""
     active_rules = rules if rules is not None else DEFAULT_RULES
     return [rule.check(pipeline) for rule in active_rules]
